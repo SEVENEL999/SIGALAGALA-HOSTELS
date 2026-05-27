@@ -25,13 +25,13 @@
     <nav class="navbar">
         <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Sigalagala<span>PREMIUM HOSTELS</span></div>
         <div class="nav-actions" id="nav-user-space">
-            <button class="btn btn-secondary" onclick="openAuthModal('landlord')">Landlord Portal</button>
-            <button class="btn btn-primary" onclick="openAuthModal('tenant')">Find Room</button>
+            <button class="btn btn-secondary" id="nav-landlord-btn" onclick="openAuthModal('login', 'landlord')">Landlord Portal</button>
+            <button class="btn btn-primary" id="nav-find-room-btn" onclick="openAuthModal('signup', 'tenant')">Find Room</button>
         </div>
     </nav>
 
     <main id="swup-container">
-        <section class="hero-section">
+        <section class="hero-section"> 
             <div class="hero-overlay">
                 <div class="hero-cta">
                     <h2 class="heavy-title">REDISCOVER <br>MODERN LIVING</h2>
@@ -78,7 +78,6 @@
                         </div>
                     </div>
 
-                    <!-- Room-Type Filter Tabs Element Layout -->
                     <div class="room-type-tabs" id="room-type-tabs-container">
                         <button class="type-tab active" data-type="all"><i class="fa-solid fa-layer-group"></i> All Spaces</button>
                         <button class="type-tab" data-type="single"><i class="fa-solid fa-user"></i> Single Room</button>
@@ -106,13 +105,40 @@
         <div class="modal-card">
             <button class="close-modal-btn" onclick="closeAuthModal()">&times;</button>
             
-            <div id="modal-auth-view">
+            <div id="modal-login-view" class="auth-view-segment">
+                <h3>Welcome Back</h3>
+                <p class="modal-subtitle">Log in using your account credentials to continue.</p>
+                
+                <form id="login-form" onsubmit="handleLoginSubmit(event)">
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="Email Address" required>
+                    </div>
+                    
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    
+                    <div class="forgot-password-link-wrapper" style="text-align: right; margin-bottom: 1rem;">
+                        <span onclick="switchAuthView('forgot')" style="color: #ff6a00; font-size: 0.85rem; cursor: pointer; font-weight: 500;">Forgot Password?</span>
+                    </div>
+                    
+                    <button type="submit" class="auth-submit-btn">Log In</button>
+                </form>
+                
+                <div class="auth-toggle-navigation">
+                    <p>New to the platform? <span onclick="switchAuthView('signup')">Create Account</span></p>
+                </div>
+            </div>
+
+            <div id="modal-signup-view" class="auth-view-segment hidden-view">
                 <h3 id="auth-title">Create Account</h3>
                 <p class="modal-subtitle" id="auth-subtitle">Join the Sigalagala luxury booking ecosystem.</p>
                 
                 <div class="role-selector" id="modal-role-selector">
-                    <button class="role-btn active" id="role-tenant" onclick="setAuthRole('tenant')">Tenant</button>
-                    <button class="role-btn" id="role-landlord" onclick="setAuthRole('landlord')">Landlord</button>
+                    <button class="role-btn active" id="role-tenant" type="button" onclick="setAuthRole('tenant')">Tenant</button>
+                    <button class="role-btn" id="role-landlord" type="button" onclick="setAuthRole('landlord')">Landlord</button>
                 </div>
                 
                 <form id="auth-form" onsubmit="handleAuthSubmit(event)">
@@ -125,6 +151,7 @@
                         <i class="fa-solid fa-phone"></i>
                         <input type="text" id="auth-phone" placeholder="Telephone Number (e.g. 254715340655)">
                     </div>
+
                     <div class="form-input-wrapper" id="wrapper-hostel-name" style="display: none;">
                         <i class="fa-solid fa-hotel"></i>
                         <input type="text" id="auth-hostel-name" placeholder="Hostel Name">
@@ -137,7 +164,7 @@
                     
                     <div class="form-input-wrapper" id="wrapper-access-key" style="display: none;">
                         <i class="fa-solid fa-key" style="color: #f59e0b;"></i>
-                        <input type="password" id="auth-access-key" placeholder="Master Access Key (Required)">
+                        <input type="password" id="auth-access-key" placeholder="Master Access Key (Required for Landlords)">
                     </div>
                     
                     <div class="form-input-wrapper" id="wrapper-password">
@@ -150,11 +177,51 @@
                         <input type="password" id="auth-confirm-password" placeholder="Confirm Password" required>
                     </div>
                     
-                    <button type="submit" class="auth-submit-btn" id="auth-submit-btn">Continue</button>
+                    <button type="submit" class="auth-submit-btn" id="auth-submit-btn">Continue Registration</button>
                 </form>
                 
                 <div class="auth-toggle-navigation">
-                    <p id="auth-toggle-text">Already have an account? <span onclick="toggleAuthMode()">Log In</span></p>
+                    <p>Already have an account? <span onclick="switchAuthView('login')">Log In</span></p>
+                </div>
+            </div>
+
+            <div id="modal-forgot-password-view" class="auth-view-segment hidden-view">
+                <h3>Reset Password</h3>
+                <p class="modal-subtitle">Choose your verification channel to receive an access OTP token.</p>
+                
+                <div class="reset-channel-selector" style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
+                    <button type="button" class="role-btn active" id="channel-email-btn" onclick="setResetChannel('email')" style="flex: 1;">Via Email</button>
+                    <button type="button" class="role-btn" id="channel-phone-btn" onclick="setResetChannel('phone')" style="flex: 1;">Via Phone SMS</button>
+                </div>
+
+                <form id="forgot-password-form" onsubmit="handlePasswordResetRequest(event)">
+                    <div class="form-input-wrapper" id="wrapper-reset-email">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="reset-email" placeholder="Registered Email Address">
+                    </div>
+
+                    <div class="form-input-wrapper" id="wrapper-reset-phone" style="display: none;">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" id="reset-phone" placeholder="Registered Phone (e.g. 254715340655)">
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">Send Verification OTP</button>
+                </form>
+
+                <form id="otp-verification-form" class="hidden-view" onsubmit="handleVerifyOtpSubmit(event)" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-shield-dots" style="color: #ff6a00;"></i>
+                        <input type="text" id="otp-token-input" placeholder="Enter 6-Digit OTP Code" required>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" id="otp-new-password" placeholder="Enter New Password" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" style="background: linear-gradient(135deg, #7f00ff, #ff6a00);">Save New Password</button>
+                </form>
+
+                <div class="auth-toggle-navigation" style="margin-top: 1rem;">
+                    <p>Remembered account? <span onclick="switchAuthView('login')">Back to Login</span></p>
                 </div>
             </div>
 
@@ -171,7 +238,6 @@
                         <input type="text" id="listing-location" list="sigalagala-locations" placeholder="Select or Type Location" required>
                     </div>
                     
-                    <!-- Distance Input Tracking Node Entry -->
                     <div class="form-input-wrapper">
                         <i class="fa-solid fa-person-walking"></i>
                         <input type="text" id="listing-distance" placeholder="Distance to Gate (e.g. 5 mins walk or 400m)" required>
@@ -186,7 +252,6 @@
                         <input type="text" id="listing-contact" placeholder="WhatsApp Contact (e.g. 254715340655)" required>
                     </div>
 
-                    <!-- Room Configuration Type Selection Field Row Dropdown -->
                     <div class="form-input-wrapper">
                         <i class="fa-solid fa-bed"></i>
                         <select id="listing-room-type" required>
@@ -197,8 +262,17 @@
                             <option value="one-bed">1-Bedroom</option>
                         </select>
                     </div>
+
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-venus-mars"></i>
+                        <select id="listing-gender-restriction" required>
+                            <option value="" disabled selected>Select Allowed Resident Demographics</option>
+                            <option value="all">All Genders Welcomed</option>
+                            <option value="male">Male Students Only</option>
+                            <option value="female">Female Students Only</option>
+                        </select>
+                    </div>
                     
-                    <!-- Amenities Selector Checkbox Matrix -->
                     <label class="section-label">Included Amenities & Systems:</label>
                     <div class="amenities-selection-grid">
                         <label class="amenity-checkbox-wrapper">
@@ -219,7 +293,6 @@
                         </label>
                     </div>
 
-                    <!-- Dynamic Counter Panel & Label Convention Custom Dropdown Row -->
                     <label class="section-label">Configure Room Count & Matrix:</label>
                     <div class="room-matrix-configurator" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color);">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -244,12 +317,14 @@
                     <label class="section-label">Select Vacant Door Numbers:</label>
                     <div class="door-selection-grid" id="modal-door-picker"></div>
 
-                    <label class="section-label">Hostel Image Presentation:</label>
+                    <label class="section-label">Hostel Image Presentation (Attach 1 to 6 Showcase Photos):</label>
                     <div class="image-uploader-placeholder" onclick="document.getElementById('listing-file-input').click()">
-                        <i class="fa-solid fa-camera"></i>
-                        <p>Upload Luxury Cover Photo</p>
-                        <input type="file" id="listing-file-input" style="display:none;" accept="image/*" onchange="previewUploadedFile(event)">
-                        <div id="image-upload-preview"></div>
+                        <i class="fa-solid fa-images" style="font-size: 1.75rem; margin-bottom: 0.5rem; color: #ff6a00;"></i>
+                        <p style="font-weight: 600; font-size: 0.9rem;">Click to Upload Showcase Assets</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Attach up to 6 high-fidelity photos simultaneously</p>
+                        <input type="file" id="listing-file-input" style="display:none;" accept="image/*" multiple onchange="previewUploadedFilesGrid(event)">
+                        
+                        <div id="image-upload-preview-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-top: 1rem;"></div>
                     </div>
 
                     <button type="submit" class="auth-submit-btn">Publish Live Listing</button>
