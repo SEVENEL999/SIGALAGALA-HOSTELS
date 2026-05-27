@@ -3,34 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sigalagala Hostel Booking Platform</title>
+    <title>Sigalagala Premium Hostel Booking Platform</title>
+    
+    <!-- Core UI Stylesheets -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Premium Google Fonts for Technical & Modern UI Hierarchy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- High-Performance Animation & 3D Core Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body class="dark-theme">
 
+    <!-- 3D High-Fidelity Unveiling Preloader Grid -->
     <div id="preloader">
         <div class="loader-content">
-            <h1>Sigalagala</h1>
+            <h1 class="glitch-text" data-text="Sigalagala">Sigalagala</h1>
             <p>Constructing 3D Experience...</p>
-            <div class="progress-bar"><div class="progress"></div></div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Background WebGL Viewport Container -->
     <div id="webgl-container"></div>
 
+    <!-- Navigation Header Matrix -->
     <nav class="navbar">
-        <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Sigalagala<span>PREMIUM HOSTELS</span></div>
+        <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            Sigalagala<span>PREMIUM HOSTELS</span>
+        </div>
         <div class="nav-actions" id="nav-user-space">
             <button class="btn btn-secondary" id="nav-landlord-btn" onclick="openAuthModal('login', 'landlord')">Landlord Portal</button>
             <button class="btn btn-primary" id="nav-find-room-btn" onclick="openAuthModal('signup', 'tenant')">Find Room</button>
         </div>
     </nav>
 
+    <!-- Interactive Layer Element Layout Container -->
     <main id="swup-container">
+        <!-- Structural Cinematic Overlay Section -->
         <section class="hero-section"> 
             <div class="hero-overlay">
                 <div class="hero-cta">
@@ -44,13 +62,16 @@
             </div>
         </section>
 
+        <!-- Live Content Allocation Booking Control Section -->
         <section class="booking-deck-section">
             <div class="container">
+                <!-- Advanced Custom Search & Dynamic Multi-Filter Widget -->
                 <div class="search-filter-widget">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text" id="hostel-search" placeholder="Search premium hostels by name...">
                     </div>
+                    
                     <div class="filter-controls">
                         <div class="filter-group">
                             <label><i class="fa-solid fa-map-pin"></i> Location</label>
@@ -65,6 +86,7 @@
                                 <option value="Shikalakala">Shikalakala</option>
                             </select>
                         </div>
+                        
                         <div class="filter-group">
                             <label><i class="fa-solid fa-tags"></i> Max Price</label>
                             <div class="range-slider-wrapper">
@@ -72,12 +94,14 @@
                                 <span id="price-val">Ksh 18,000</span>
                             </div>
                         </div>
+                        
                         <div class="filter-group checkbox-group">
                             <input type="checkbox" id="hide-occupied-filter">
                             <label for="hide-occupied-filter">Hide Occupied Rooms</label>
                         </div>
                     </div>
 
+                    <!-- Room Architecture Layout Grid Navigation Tabs -->
                     <div class="room-type-tabs" id="room-type-tabs-container">
                         <button class="type-tab active" data-type="all"><i class="fa-solid fa-layer-group"></i> All Spaces</button>
                         <button class="type-tab" data-type="single"><i class="fa-solid fa-user"></i> Single Room</button>
@@ -87,24 +111,31 @@
                     </div>
                 </div>
 
+                <!-- Matrix Feed Allocation Dynamic Header -->
                 <div class="grid-header">
                     <h3>Available Residencies</h3>
                     <span class="live-indicator"><span class="pulse-dot"></span> Live Room Allocation Active</span>
                 </div>
                 
+                <!-- Target Card Presentation Grid Output Container -->
                 <div class="hostel-grid" id="hostel-display-grid">
                     <div class="empty-state-container">
-                        <h3 class="no-availability-text"><i class="fa-solid fa-building-circle-exclamation" style="margin-right: 8px;"></i> No residences available at the moment</h3>
+                        <h3 class="no-availability-text">
+                            <i class="fa-solid fa-building-circle-exclamation" style="margin-right: 8px;"></i> 
+                            No residences available at the moment
+                        </h3>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Global Secure Authentication Component View Overlay -->
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-card">
             <button class="close-modal-btn" onclick="closeAuthModal()">&times;</button>
             
+            <!-- Context View: Secure User Credentials Login Entry Point -->
             <div id="modal-login-view" class="auth-view-segment">
                 <h3>Welcome Back</h3>
                 <p class="modal-subtitle">Log in using your account credentials to continue.</p>
@@ -132,6 +163,7 @@
                 </div>
             </div>
 
+            <!-- Context View: Ecosystem Registration Sequence -->
             <div id="modal-signup-view" class="auth-view-segment hidden-view">
                 <h3 id="auth-title">Create Account</h3>
                 <p class="modal-subtitle" id="auth-subtitle">Join the Sigalagala luxury booking ecosystem.</p>
@@ -185,6 +217,7 @@
                 </div>
             </div>
 
+            <!-- Context View: Secure Password Reset Token Verification Channel -->
             <div id="modal-forgot-password-view" class="auth-view-segment hidden-view">
                 <h3>Reset Password</h3>
                 <p class="modal-subtitle">Choose your verification channel to receive an access OTP token.</p>
@@ -225,6 +258,7 @@
                 </div>
             </div>
 
+            <!-- Context View: Landlord Core Studio Vector Form -->
             <div id="modal-landlord-dashboard" class="hidden-view">
                 <h3>Hostel Listing Studio</h3>
                 <p class="modal-subtitle">Publish and monitor your premium rooms in real-time.</p>
@@ -333,6 +367,7 @@
         </div>
     </div>
 
+    <!-- Administrative Core Footer Navigation -->
     <footer class="platform-footer">
         <div class="footer-container">
             <div class="footer-contact-links">
@@ -350,8 +385,9 @@
                 &copy; 2026 Sigalagala Premium. All Rights Reserved.
             </div>
         </div>
-    </footer>
+    </footer >
 
+    <!-- Global Native Autocomplete Mapping Vectors -->
     <datalist id="sigalagala-locations">
         <option value="Ikolomani"></option>
         <option value="Runda"></option>
@@ -362,6 +398,7 @@
         <option value="Shikalakala"></option>
     </datalist>
 
+    <!-- Pipeline Script Injection Blocks -->
     <script src="three-scene.js"></script>
     <script src="main.js"></script>
 </body>
