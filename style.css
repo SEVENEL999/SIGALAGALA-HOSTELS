@@ -42,6 +42,7 @@ body.dark-theme {
 /* Premium Fluid Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 10px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
     background: var(--bg-primary);
@@ -364,12 +365,16 @@ main {
 
 .filter-group select, 
 .form-input-wrapper select {
-    padding: 0.9rem 1.75rem;
-    background: rgba(0, 0, 0, 0.2);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 0.9rem 2.5rem 0.9rem 1.75rem;
+    background: rgba(0, 0, 0, 0.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239494a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 1.25rem) center;
     border: 1px solid var(--border-color);
     border-radius: 14px;
     color: var(--text-main);
     font-weight: 500;
+    font-size: 1rem;
     outline: none;
     cursor: pointer;
     transition: var(--transition-luxury);
@@ -379,9 +384,9 @@ main {
 }
 .filter-group select option,
 .form-input-wrapper select option,
-select {
-    background-color: var(--bg-secondary) !important;
-    color: var(--text-main) !important;
+select option {
+    background-color: var(--bg-secondary);
+    color: var(--text-main);
 }
 
 .range-slider-wrapper {
@@ -425,9 +430,6 @@ select {
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.04);
     overflow-x: auto;
-}
-.room-type-tabs::-webkit-scrollbar {
-    height: 3px;
 }
 
 .type-tab {
@@ -493,7 +495,7 @@ select {
 }
 
 /* ==========================================================================
-   5. HOSTEL INTERFACE CARDS (DE-CRAMPED & LUXURY POLISHED)
+   5. HOSTEL INTERFACE CARDS
    ========================================================================== */
 .hostel-card {
     position: relative;
@@ -549,11 +551,10 @@ select {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* Structural Gap System Engines */
 .card-details {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;              
+    gap: 1.5rem;             
     flex: 1;
     padding: 2rem;            
 }
@@ -598,7 +599,7 @@ select {
 
 .card-amenities-ribbon {
     display: flex;
-    gap: 8px;                 
+    gap: 8px;                  
     flex-wrap: wrap;
 }
 .card-amenity-pill {
@@ -633,7 +634,6 @@ select {
     text-transform: uppercase;
 }
 
-/* Suite Inventory Interface Matrix */
 .door-badges-inventory {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
@@ -891,6 +891,7 @@ select {
     color: rgba(255, 255, 255, 0.2);
     font-size: 1.1rem;
     pointer-events: none;
+    z-index: 2;
 }
 .form-input-wrapper input,
 .form-input-wrapper select {
@@ -908,6 +909,11 @@ select {
     background: rgba(0, 0, 0, 0.35);
     border-color: var(--accent-glow);
     box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+.form-input-wrapper select {
+    padding-right: 2.5rem;
+    background-position: calc(100% - 1.25rem) center;
 }
 
 .amenities-selection-grid {
@@ -1210,8 +1216,13 @@ select {
     }
     
     .form-input-wrapper input, 
-    .form-input-wrapper select {
+    .form-input-wrapper select,
+    .filter-group select {
         padding: 14px 14px 14px 44px !important;
         font-size: 16px !important;
+    }
+
+    .filter-group select {
+        padding-left: 1.25rem !important;
     }
 }
