@@ -28,8 +28,8 @@ function init3DScene() {
     // Lowered FOV to 25/30 to act like a telephoto/isometric lens, keeping the model sharp and large while far away
     camera = new THREE.PerspectiveCamera(isMobile ? 32 : 25, window.innerWidth / window.innerHeight, 0.1, 1000);
     
-    // ADJUSTED: Positioned the camera significantly higher (Y=32/26) and further back (X & Z) to preserve a striking 3D perspective
-    camera.position.set(isMobile ? 24 : 20, isMobile ? 32 : 26, isMobile ? 24 : 20);
+    // ADJUSTED: Raised the camera Y-axis slightly higher (Y=36/30) to enhance the architectural perspective
+    camera.position.set(isMobile ? 24 : 20, isMobile ? 36 : 30, isMobile ? 24 : 20);
     camera.lookAt(0, 0, 0);
 
     // Dynamic anti-aliasing throttle to prevent high processing dropouts on Android GPUs
@@ -46,15 +46,16 @@ function init3DScene() {
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
-    dirLight.position.set(10, 35, 12); // Raised global lighting rigging to illuminate the house from the new altitude
+    // ADJUSTED: Slightly raised the directional light to match the new camera altitude
+    dirLight.position.set(10, 40, 12); 
     scene.add(dirLight);
 
     const accentLight = new THREE.PointLight(0x7f00ff, 2.5, 30);
     accentLight.position.set(-5, 15, -5);
     scene.add(accentLight);
 
-    // ADJUSTED: Pushed clipping plane distance to 40 to completely prevent clipping issues from this far away
-    revealPlane = new THREE.Plane(new THREE.Vector3(0, -1, -0.4).normalize(), 40);
+    // ADJUSTED: Maintained a strong clipping distance safety margin to accommodate the higher viewpoint
+    revealPlane = new THREE.Plane(new THREE.Vector3(0, -1, -0.4).normalize(), 45);
 
     // Async GLTF Loader Mechanism
     const loader = new THREE.GLTFLoader();
@@ -127,8 +128,8 @@ window.addEventListener('resize', () => {
     const isMobile = window.innerWidth < 768;
     camera.aspect = window.innerWidth / window.innerHeight;
     
-    // ADJUSTED: Re-synchronized the deep high-altitude coordinates during window resizing events
-    camera.position.set(isMobile ? 24 : 20, isMobile ? 32 : 26, isMobile ? 24 : 20);
+    // ADJUSTED: Re-synchronized the new higher elevation values during resize layout reflows
+    camera.position.set(isMobile ? 24 : 20, isMobile ? 36 : 30, isMobile ? 24 : 20);
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
