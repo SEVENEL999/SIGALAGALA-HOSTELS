@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sigalagala Hostel Booking Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="dark-theme">
+
+    <div id="preloader">
+        <div class="loader-content">
+            <h1>Sigalagala</h1>
+            <p>Constructing 3D Experience...</p>
+            <div class="progress-bar"><div class="progress"></div></div>
+        </div>
+    </div>
+
+    <div id="webgl-container"></div>
+
+    <nav class="navbar">
+        <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Sigalagala<span>PREMIUM HOSTELS</span></div>
+        <div class="nav-actions" id="nav-user-space">
+            <button class="btn btn-secondary" onclick="openAuthModal('landlord')">Landlord Portal</button>
+            <button class="btn btn-primary" onclick="openAuthModal('tenant')">Find Room</button>
+        </div>
+    </nav>
+
+    <main id="swup-container">
+        <section class="hero-section">
+            <div class="hero-overlay">
+                <div class="hero-cta">
+                    <h2 class="heavy-title">REDISCOVER <br>MODERN LIVING</h2>
+                    <p class="subtitle">Experience premium student residency. Scroll down to unveil your space instantly.</p>
+                    <div class="scroll-indicator" onclick="document.querySelector('.booking-deck-section').scrollIntoView({behavior: 'smooth'})">
+                        <span class="mouse-icon"><span class="wheel"></span></span>
+                        <p>Scroll to Reveal</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="booking-deck-section">
+            <div class="container">
+                <div class="search-filter-widget">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="hostel-search" placeholder="Search premium hostels by name...">
+                    </div>
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label><i class="fa-solid fa-map-pin"></i> Location</label>
+                            <select id="location-filter">
+                                <option value="all">All Locations</option>
+                                <option value="Ikolomani">Ikolomani</option>
+                                <option value="Runda">Runda</option>
+                                <option value="Chief Milimu">Chief Milimu</option>
+                                <option value="Shipalo">Shipalo</option>
+                                <option value="Museno">Museno</option>
+                                <option value="Behind the school">Behind the school</option>
+                                <option value="Shikalakala">Shikalakala</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="fa-solid fa-tags"></i> Max Price</label>
+                            <div class="range-slider-wrapper">
+                                <input type="range" id="price-filter" min="2000" max="18000" step="500" value="18000">
+                                <span id="price-val">Ksh 18,000</span>
+                            </div>
+                        </div>
+                        <div class="filter-group checkbox-group">
+                            <input type="checkbox" id="hide-occupied-filter">
+                            <label for="hide-occupied-filter">Hide Occupied Rooms</label>
+                        </div>
+                    </div>
+
+                    <!-- Room-Type Filter Tabs Element Layout -->
+                    <div class="room-type-tabs" id="room-type-tabs-container">
+                        <button class="type-tab active" data-type="all"><i class="fa-solid fa-layer-group"></i> All Spaces</button>
+                        <button class="type-tab" data-type="single"><i class="fa-solid fa-user"></i> Single Room</button>
+                        <button class="type-tab" data-type="bedsitter"><i class="fa-solid fa-couch"></i> Bedsitter</button>
+                        <button class="type-tab" data-type="sharing"><i class="fa-solid fa-users"></i> Shared Rooms</button>
+                        <button class="type-tab" data-type="one-bed"><i class="fa-solid fa-door-open"></i> 1-Bedroom</button>
+                    </div>
+                </div>
+
+                <div class="grid-header">
+                    <h3>Available Residencies</h3>
+                    <span class="live-indicator"><span class="pulse-dot"></span> Live Room Allocation Active</span>
+                </div>
+                
+                <div class="hostel-grid" id="hostel-display-grid">
+                    <div class="empty-state-container">
+                        <h3 class="no-availability-text"><i class="fa-solid fa-building-circle-exclamation" style="margin-right: 8px;"></i> No residences available at the moment</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-modal-btn" onclick="closeAuthModal()">&times;</button>
+            
+            <div id="modal-auth-view">
+                <h3 id="auth-title">Create Account</h3>
+                <p class="modal-subtitle" id="auth-subtitle">Join the Sigalagala luxury booking ecosystem.</p>
+                
+                <div class="role-selector" id="modal-role-selector">
+                    <button class="role-btn active" id="role-tenant" onclick="setAuthRole('tenant')">Tenant</button>
+                    <button class="role-btn" id="role-landlord" onclick="setAuthRole('landlord')">Landlord</button>
+                </div>
+                
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                    <div class="form-input-wrapper" id="wrapper-username">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="auth-username" placeholder="Full Names" required>
+                    </div>
+                    
+                    <div class="form-input-wrapper" id="wrapper-phone" style="display: none;">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" id="auth-phone" placeholder="Telephone Number (e.g. 254715340655)">
+                    </div>
+                    <div class="form-input-wrapper" id="wrapper-hostel-name" style="display: none;">
+                        <i class="fa-solid fa-hotel"></i>
+                        <input type="text" id="auth-hostel-name" placeholder="Hostel Name">
+                    </div>
+                    
+                    <div class="form-input-wrapper" id="wrapper-email">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="auth-email" placeholder="Email Address" required>
+                    </div>
+                    
+                    <div class="form-input-wrapper" id="wrapper-access-key" style="display: none;">
+                        <i class="fa-solid fa-key" style="color: #f59e0b;"></i>
+                        <input type="password" id="auth-access-key" placeholder="Master Access Key (Required)">
+                    </div>
+                    
+                    <div class="form-input-wrapper" id="wrapper-password">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="auth-password" placeholder="Create Password" required>
+                    </div>
+                    
+                    <div class="form-input-wrapper" id="wrapper-confirm-password">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <input type="password" id="auth-confirm-password" placeholder="Confirm Password" required>
+                    </div>
+                    
+                    <button type="submit" class="auth-submit-btn" id="auth-submit-btn">Continue</button>
+                </form>
+                
+                <div class="auth-toggle-navigation">
+                    <p id="auth-toggle-text">Already have an account? <span onclick="toggleAuthMode()">Log In</span></p>
+                </div>
+            </div>
+
+            <div id="modal-landlord-dashboard" class="hidden-view">
+                <h3>Hostel Listing Studio</h3>
+                <p class="modal-subtitle">Publish and monitor your premium rooms in real-time.</p>
+                <form id="landlord-listing-form" onsubmit="handleNewListing(event)">
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-building"></i>
+                        <input type="text" id="listing-name" placeholder="Hostel Name" required>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <input type="text" id="listing-location" list="sigalagala-locations" placeholder="Select or Type Location" required>
+                    </div>
+                    
+                    <!-- Distance Input Tracking Node Entry -->
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-person-walking"></i>
+                        <input type="text" id="listing-distance" placeholder="Distance to Gate (e.g. 5 mins walk or 400m)" required>
+                    </div>
+
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-wallet"></i>
+                        <input type="number" id="listing-price" placeholder="Price per Semester (Ksh)" required>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" id="listing-contact" placeholder="WhatsApp Contact (e.g. 254715340655)" required>
+                    </div>
+
+                    <!-- Room Configuration Type Selection Field Row Dropdown -->
+                    <div class="form-input-wrapper">
+                        <i class="fa-solid fa-bed"></i>
+                        <select id="listing-room-type" required>
+                            <option value="" disabled selected>Select Room Layout Type</option>
+                            <option value="single">Single Room</option>
+                            <option value="bedsitter">Bedsitter</option>
+                            <option value="sharing">Shared Rooms</option>
+                            <option value="one-bed">1-Bedroom</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Amenities Selector Checkbox Matrix -->
+                    <label class="section-label">Included Amenities & Systems:</label>
+                    <div class="amenities-selection-grid">
+                        <label class="amenity-checkbox-wrapper">
+                            <input type="checkbox" name="amenities" value="wifi">
+                            <span><i class="fa-solid fa-wifi"></i> Wi-Fi</span>
+                        </label>
+                        <label class="amenity-checkbox-wrapper">
+                            <input type="checkbox" name="amenities" value="water">
+                            <span><i class="fa-solid fa-droplet"></i> 24/7 Water</span>
+                        </label>
+                        <label class="amenity-checkbox-wrapper">
+                            <input type="checkbox" name="amenities" value="shower">
+                            <span><i class="fa-solid fa-temperature-three-quarters"></i> Hot Shower</span>
+                        </label>
+                        <label class="amenity-checkbox-wrapper">
+                            <input type="checkbox" name="amenities" value="token">
+                            <span><i class="fa-solid fa-bolt"></i> Own Token</span>
+                        </label>
+                    </div>
+
+                    <!-- Dynamic Counter Panel & Label Convention Custom Dropdown Row -->
+                    <label class="section-label">Configure Room Count & Matrix:</label>
+                    <div class="room-matrix-configurator" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Total Rooms Available:</span>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <button type="button" class="btn-secondary" id="decrease-rooms-btn" style="padding: 4px 12px; border-radius: 6px; font-weight: 800;" onclick="adjustRoomCount(-1)">-</button>
+                                <span id="room-count-display" style="font-weight: 700; color: var(--accent-glow); min-width: 24px; text-align: center;">5</span>
+                                <button type="button" class="btn-secondary" id="increase-rooms-btn" style="padding: 4px 12px; border-radius: 6px; font-weight: 800;" onclick="adjustRoomCount(1)">+</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Door Label System:</span>
+                            <select id="listing-numbering-system" onchange="regenerateDoorSelectionGrid()" style="width: 100%; padding: 8px; border-radius: 8px; background: #121216; color: var(--text-main); border: 1px solid var(--border-color); outline: none;">
+                                <option value="numeric">Pure Numbers (1, 2, 3...)</option>
+                                <option value="alpha-numeric-fixed">Alpha-Numeric A Series (A1, A2, A3...)</option>
+                                <option value="alpha-numeric-mixed">Alpha-Numeric Multi-Wing (A1, B2, C3...)</option>
+                                <option value="alpha">Pure Letters (A, B, C...)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <label class="section-label">Select Vacant Door Numbers:</label>
+                    <div class="door-selection-grid" id="modal-door-picker"></div>
+
+                    <label class="section-label">Hostel Image Presentation:</label>
+                    <div class="image-uploader-placeholder" onclick="document.getElementById('listing-file-input').click()">
+                        <i class="fa-solid fa-camera"></i>
+                        <p>Upload Luxury Cover Photo</p>
+                        <input type="file" id="listing-file-input" style="display:none;" accept="image/*" onchange="previewUploadedFile(event)">
+                        <div id="image-upload-preview"></div>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">Publish Live Listing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="platform-footer">
+        <div class="footer-container">
+            <div class="footer-contact-links">
+                <a href="#" class="footer-link">
+                    <i class="fa-solid fa-user-shield"></i> Sevenel Artist (Admin)
+                </a>
+                <a href="mailto:sevenelartist@gmail.com" class="footer-link">
+                    <i class="fa-solid fa-envelope"></i> sevenelartist@gmail.com
+                </a>
+                <a href="https://wa.me/254715340655" target="_blank" class="footer-link">
+                    <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> Support Chat
+                </a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2026 Sigalagala Premium. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <datalist id="sigalagala-locations">
+        <option value="Ikolomani"></option>
+        <option value="Runda"></option>
+        <option value="Chief Milimu"></option>
+        <option value="Shipalo"></option>
+        <option value="Museno"></option>
+        <option value="Behind the school"></option>
+        <option value="Shikalakala"></option>
+    </datalist>
+
+    <script src="three-scene.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
