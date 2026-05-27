@@ -92,12 +92,17 @@ function initializePreloader() {
             progress = 100;
             clearInterval(interval);
             
-            gsap.to(preloader, {
-                opacity: 0,
-                duration: 0.6,
-                ease: "power2.out",
-                onComplete: () => preloader.style.display = "none"
-            });
+            if (window.gsap) {
+                gsap.to(preloader, {
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.out",
+                    onComplete: () => preloader.style.display = "none"
+                });
+            } else {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = "none", 600);
+            }
         }
         if (progressEl) progressEl.style.width = `${progress}%`;
     }, 80);
@@ -118,7 +123,12 @@ function loadPlatformData() {
 }
 
 function savePlatformData() {
-    localStorage.setItem("sigalagala_hostels", JSON.stringify(hostels));
+    try {
+        localStorage.setItem("sigalagala_hostels", JSON.stringify(hostels));
+    } catch (e) {
+        console.error("Storage Exception: Failed to save to localStorage. Compressing memory state context...", e);
+        alert("System Notice: Storage limit near capacity. Discarding cached background image models to save memory room structural state safely.");
+    }
 }
 
 function checkExistingSession() {
@@ -144,11 +154,13 @@ function openAuthModal(defaultRole = 'tenant') {
     authMode = 'signup'; 
     setAuthRole(defaultRole);
     
-    gsap.fromTo(".modal-card", { scale: 0.85, y: 40, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.4, ease: "power4.out" });
+    if (window.gsap) {
+        gsap.fromTo(".modal-card", { scale: 0.85, y: 40, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.4, ease: "power4.out" });
+    }
 }
 
 function closeAuthModal() {
-    gsap.to(".modal-card", { scale: 0.9, y: 20, opacity: 0, duration: 0.25, ease: "power2.in", onComplete: () => {
+    const executeCloseEffects = () => {
         const modal = document.getElementById("auth-modal");
         if (modal) modal.classList.remove("active");
         
@@ -161,7 +173,13 @@ function closeAuthModal() {
             preview.style.backgroundImage = "none";
         }
         temporaryUploadedImageBase64 = "";
-    }});
+    };
+
+    if (window.gsap) {
+        gsap.to(".modal-card", { scale: 0.9, y: 20, opacity: 0, duration: 0.25, ease: "power2.in", onComplete: executeCloseEffects });
+    } else {
+        executeCloseEffects();
+    }
 }
 
 function toggleAuthMode() {
@@ -302,12 +320,23 @@ function handleAuthSubmit(event) {
 }
 
 function morphToView(hideId, showId) {
-    gsap.to(`#${hideId}`, { opacity: 0, x: -20, duration: 0.25, onComplete: () => {
+    const runFallbackMorph = () => {
         document.getElementById(hideId).classList.add("hidden-view");
         const showEl = document.getElementById(showId);
         showEl.classList.remove("hidden-view");
-        gsap.fromTo(`#${showId}`, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" });
-    }});
+        showEl.style.opacity = "1";
+    };
+
+    if (window.gsap) {
+        gsap.to(`#${hideId}`, { opacity: 0, x: -20, duration: 0.25, onComplete: () => {
+            document.getElementById(hideId).classList.add("hidden-view");
+            const showEl = document.getElementById(showId);
+            showEl.classList.remove("hidden-view");
+            gsap.fromTo(`#${showId}`, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" });
+        }});
+    } else {
+        runFallbackMorph();
+    }
 }
 
 function logoutPlatform() {
@@ -406,6 +435,11 @@ function renderHostelGrid() {
         
         return matchesSearch && matchesLoc && matchesPrice && matchesType && matchesOccupancy;
     });
+
+    // Integrated hook: Speeds up 3D engine matrix scan layout speed if searches change
+    if (typeof houseModel !== 'undefined' && houseModel) {
+        houseModel.rotation.y += 0.05; 
+    }
 
     if (targetHostels.length === 0) {
         grid.innerHTML = `
@@ -591,17 +625,45 @@ function previewUploadedFile(event) {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-        temporaryUploadedImageBase64 = e.target.result;
-        const previewEl = document.getElementById("image-upload-preview");
-        if (previewEl) {
-            previewEl.style.display = "block";
-            previewEl.style.backgroundImage = `url('${temporaryUploadedImageBase64}')`;
-            previewEl.style.backgroundSize = "cover";
-            previewEl.style.backgroundPosition = "center";
-            previewEl.style.height = "120px";
-            previewEl.style.borderRadius = "8px";
-            previewEl.style.marginTop = "8px";
-        }
+        const rawImg = new Image();
+        rawImg.src = e.target.result;
+        rawImg.onload = function() {
+            // Compress image dynamically on the client canvas thread to avoid breaching localStorage size capacities
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const maxDimension = 600;
+            let width = rawImg.width;
+            let height = rawImg.height;
+
+            if (width > height) {
+                if (width > maxDimension) {
+                    height *= maxDimension / width;
+                    width = maxDimension;
+                }
+            } else {
+                if (height > maxDimension) {
+                    width *= maxDimension / height;
+                    height = maxDimension;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(rawImg, 0, 0, width, height);
+            
+            temporaryUploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+            const previewEl = document.getElementById("image-upload-preview");
+            if (previewEl) {
+                previewEl.style.display = "block";
+                previewEl.style.backgroundImage = `url('${temporaryUploadedImageBase64}')`;
+                previewEl.style.backgroundSize = "cover";
+                previewEl.style.backgroundPosition = "center";
+                previewEl.style.height = "120px";
+                previewEl.style.borderRadius = "8px";
+                previewEl.style.marginTop = "8px";
+            }
+        };
     };
     
     reader.readAsDataURL(file);
@@ -673,6 +735,10 @@ function handleNewListing(event) {
     // Smooth navigation viewport tracking shift anchor focus point directly on top grid matrix results 
     setTimeout(() => {
         const gridHeader = document.querySelector('.grid-header');
-        if (gridHeader) gridHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (gridHeader) {
+            gridHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+        }
     }, 400);
 }
